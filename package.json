@@ -1,6 +1,6 @@
 {
   "name": "lexlens",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "private": true,
   "description": "Local-first vocabulary annotation browser extension prototype",
   "scripts": {

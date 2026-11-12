@@ -311,17 +311,32 @@
       .banner { position:fixed; right:12px; bottom:12px; max-width:min(400px,calc(100vw - 24px)); background:#fffdf0; color:#15243c; border:1px solid #b8a866; border-radius:9px; padding:10px 12px; box-shadow:0 5px 20px #14203b33; }
       :host([data-floating="true"]) .banner { right:76px; }
       .banner button { margin-left:8px; }
-      .float-button { position:fixed; z-index:2147483646; right:16px; width:48px; height:48px; padding:0; border:1px solid #e0f9f3; border-radius:50%; background:#173a69; color:#fff; box-shadow:0 5px 18px #14203b66; font-size:20px; font-weight:700; line-height:1; touch-action:none; user-select:none; }
-      .float-button:hover,.float-button[aria-expanded="true"] { background:#245a98; }
-      .float-menu { position:fixed; z-index:2147483646; right:76px; width:min(290px,calc(100vw - 88px)); max-height:calc(100dvh - 24px); overflow:auto; overscroll-behavior:contain; padding:14px; border:1px solid #a9b8d0; border-radius:14px; background:#fff; box-shadow:0 12px 35px #14203b44; }
-      .float-menu h2 { margin:0 32px 12px 0; font-size:17px; line-height:1.3; }
-      .float-menu .float-close { position:absolute; right:10px; top:9px; padding:2px 8px; }
-      .float-menu label { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0; font-size:13px; }
-      .float-menu select { min-width:116px; max-width:60%; font:inherit; padding:5px; border:1px solid #a7b8d2; border-radius:7px; background:#fff; color:#183f79; }
-      .float-menu input[type="checkbox"] { width:18px; height:18px; accent-color:#184f9d; }
-      .float-menu .float-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-      .float-menu .float-actions button { flex:1 1 auto; }
-      .float-menu .float-hint { margin:9px 0 0; color:#52617b; font-size:11px; }
+      .float-button { position:fixed; z-index:2147483646; right:16px; width:48px; height:48px; padding:0; border:1px solid #c9ddca; border-radius:15px 15px 15px 5px; background:linear-gradient(145deg,#245c4a,#153d34); color:#f8f5e9; box-shadow:0 5px 0 #a8bdb050,0 12px 25px #173a3040; font:700 20px/1 Georgia,"Songti SC",serif; touch-action:none; user-select:none; transition:background .2s ease,box-shadow .2s ease,transform .2s ease; }
+      .float-button::after { content:""; position:absolute; top:8px; right:7px; width:5px; height:5px; border-radius:50%; background:#b9daa9; }
+      .float-button:hover,.float-button[aria-expanded="true"] { background:#276650; box-shadow:0 6px 0 #a8bdb050,0 15px 28px #173a3050; transform:translateY(-2px); }
+      .float-button:active { transform:translateY(0) scale(.97); }
+      .float-menu { position:fixed; z-index:2147483646; right:76px; width:min(302px,calc(100vw - 88px)); max-height:calc(100dvh - 24px); overflow:auto; overscroll-behavior:contain; padding:0 16px 13px; border:1px solid #d0d8cb; border-radius:16px; background:#f8f8f2; color:#193b32; box-shadow:0 17px 45px #142b2540,0 2px 7px #142b251a; font:13px/1.4 system-ui,-apple-system,"PingFang SC",sans-serif; animation:float-menu-enter .2s ease-out both; }
+      .float-menu button:focus-visible,.float-menu select:focus-visible,.float-menu input:focus-visible,.float-button:focus-visible { outline:2px solid #a95d3e; outline-offset:2px; }
+      .float-menu .float-head { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin:0 -16px 7px; padding:14px 16px 12px; color:#f4f6ed; background:#19483b; border-radius:15px 15px 0 0; }
+      .float-menu .float-eyebrow { display:block; margin-bottom:4px; color:#bad7c2; font:700 9px/1.2 system-ui,sans-serif; letter-spacing:.14em; }
+      .float-menu h2 { margin:0; color:#f9f7ed; font:700 21px/1.15 Georgia,"Songti SC",serif; letter-spacing:-.04em; }
+      .float-menu .float-close { flex:none; display:grid; place-items:center; width:28px; height:28px; padding:0; border:1px solid #ffffff70; border-radius:50%; background:#ffffff15; color:#fff; font:20px/1 system-ui,sans-serif; }
+      .float-menu .float-close:hover { background:#ffffff33; }
+      .float-menu label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:42px; margin:0; border-bottom:1px solid #e1e6dc; color:#274d3f; font-size:12px; font-weight:600; }
+      .float-menu label:has(select) { min-height:48px; }
+      .float-menu select { min-width:116px; max-width:59%; font:650 12px/1.2 system-ui,sans-serif; padding:7px 8px; border:1px solid #cbd8cb; border-radius:8px; background:#fffefa; color:#174235; }
+      .float-menu input[type="checkbox"] { appearance:none; position:relative; flex:none; width:34px; height:20px; margin:0; border:1px solid #bccbc0; border-radius:20px; background:#dbe2d8; cursor:pointer; transition:background .2s ease,border-color .2s ease; }
+      .float-menu input[type="checkbox"]::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 3px #0003; transition:transform .2s ease; }
+      .float-menu input[type="checkbox"]:checked { background:#24634f; border-color:#24634f; }
+      .float-menu input[type="checkbox"]:checked::after { transform:translateX(14px); }
+      .float-menu .float-actions { display:flex; gap:7px; margin-top:13px; }
+      .float-menu .float-actions button { flex:1 1 0; min-width:0; padding:9px 5px; border-radius:8px; border-color:#cad7ca; background:#fffefa; color:#245342; font-size:11px; font-weight:700; transition:transform .18s ease,background .18s ease; }
+      .float-menu .float-actions button:first-child { border-color:#bc6845; background:#bc6845; color:#fff; }
+      .float-menu .float-actions button:hover { transform:translateY(-2px); background:#edf2e9; }
+      .float-menu .float-actions button:first-child:hover { background:#a95737; }
+      .float-menu .float-hint { margin:10px 0 0; color:#718277; font-size:10px; line-height:1.45; }
+      @keyframes float-menu-enter { from { opacity:0; transform:translateY(6px) scale(.985); } to { opacity:1; transform:none; } }
+      @media (prefers-reduced-motion:reduce) { .float-button,.float-menu,.float-menu input[type="checkbox"],.float-menu input[type="checkbox"]::after,.float-menu .float-actions button { animation:none; transition:none; } }
       .reader { position:fixed; inset:0; overflow:auto; background:#f8f7f2; color:#17263a; z-index:2; }
       .reader-head { position:sticky; top:0; background:#fff; border-bottom:1px solid #ccd3dd; padding:12px max(20px,calc((100vw - 760px)/2)); display:flex; gap:12px; align-items:center; justify-content:space-between; }
       .reader-main { max-width:760px; margin:auto; padding:16px 20px 80px; font:20px/2.2 system-ui,-apple-system,sans-serif; }
@@ -380,9 +395,13 @@
     menu.className = 'float-menu';
     menu.setAttribute('role', 'dialog');
     menu.setAttribute('aria-label', 'LexLens 快捷设置');
-    const title = document.createElement('h2'); title.textContent = 'LexLens 快捷设置';
+    const head = document.createElement('div'); head.className = 'float-head';
+    const heading = document.createElement('div');
+    const eyebrow = document.createElement('span'); eyebrow.className = 'float-eyebrow'; eyebrow.textContent = 'LEXLENS / QUICK ACCESS';
+    const title = document.createElement('h2'); title.textContent = '网页快捷设置';
+    heading.append(eyebrow, title);
     const close = document.createElement('button'); close.className = 'float-close'; close.textContent = '×'; close.setAttribute('aria-label', '关闭快捷设置'); close.onclick = closeFloatingMenu;
-    menu.append(title, close);
+    head.append(heading, close); menu.append(head);
     const addRow = (labelText, control) => {
       const label = document.createElement('label');
       const span = document.createElement('span'); span.textContent = labelText;

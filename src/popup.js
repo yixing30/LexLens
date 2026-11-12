@@ -75,7 +75,7 @@
       } else if (!response.englishEnabled) {
         message('LexLens 已连接，但英语标注已关闭。');
       } else if (response.marked) {
-        message(`LexLens 已运行（${response.englishEvidence === 'sourced' ? '词表分级' : '包含粗略估计'}），${counts}。`);
+        message(`${response.englishEvidence === 'sourced' ? '词表分级' : '含粗略估计'} · 已完成扫描`);
       } else if (!rescanAttempted) {
         rescanAttempted = true;
         message('未发现标注，正在重新扫描网页…');

@@ -48,7 +48,8 @@ test('opening the popup starts annotation when the page has no content script', 
     ['js', ['data/english-levels.js', 'data/english-inline.js', 'data/english-auto.js', 'src/core.js', 'src/content.js']]
   ]);
   assert.equal(messages, 2);
-  assert.match(element('status').textContent, /上方释义 3 处/);
+  assert.equal(element('marked-count').textContent, '3');
+  assert.match(element('status').textContent, /已完成扫描/);
 });
 
 test('an initial false zero triggers one real page rescan', async () => {
@@ -79,7 +80,8 @@ test('an initial false zero triggers one real page rescan', async () => {
   });
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.deepEqual(sent, ['lexlens:status', 'lexlens:rescan', 'lexlens:status']);
-  assert.match(element('status').textContent, /上方释义 2 处/);
+  assert.equal(element('marked-count').textContent, '2');
+  assert.match(element('status').textContent, /词表分级 · 已完成扫描/);
 });
 
 test('floating button switch persists separately from annotation settings', async () => {
