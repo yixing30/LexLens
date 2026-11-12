@@ -16,7 +16,10 @@
   const markedCount = document.getElementById('marked-count');
   const activeSite = document.getElementById('active-site');
   const liveState = document.getElementById('live-state');
-  function connectionState(label) { liveState.textContent = label; }
+  function connectionState(label) {
+    liveState.textContent = label;
+    liveState.setAttribute?.('data-state', label === '本机运行' ? 'active' : ['扫描中', '连接中'].includes(label) ? 'working' : 'inactive');
+  }
   function message(text) { status.textContent = text; }
   function get(keys) { return new Promise(resolve => api.storage.local.get(keys, x => resolve(x || {}))); }
   function set(value) { return new Promise(resolve => api.storage.local.set(value, resolve)); }
@@ -126,6 +129,12 @@
   document.getElementById('selftest').addEventListener('click', () => {
     api.tabs.create({ url: api.runtime.getURL('src/selftest.html') });
     window.close();
+  });
+  const advanced = document.querySelector?.('.advanced-card');
+  advanced?.addEventListener('toggle', () => {
+    if (advanced.open) advanced.scrollIntoView({
+      block: 'start', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
   });
   document.getElementById('check-page').addEventListener('click', () => {
     if (!tabId) return;

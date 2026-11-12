@@ -13,10 +13,10 @@ OUTPUT = ROOT / "dist" / "LexLens-Chrome"
 FILES = [
     "manifest.json",
     "src/background.js", "src/content.css", "src/content.js", "src/core.js",
-    "src/options.html", "src/options.js", "src/popup.html", "src/popup.js", "src/selftest.html", "src/ui.css",
+    "src/options.html", "src/options.js", "src/popup.html", "src/popup.css", "src/popup.js", "src/selftest.html", "src/ui.css",
     "data/english-levels.js", "data/english-inline.js", "data/english-auto.js", "data/english-lookup.json", "data/english-detail.json",
     "data/ECDICT-LICENSE.txt", "data/NOTICE.md", "data/ENGLISH-LEVELS-NOTICE.md",
-    "icons/icon-16.png", "icons/icon-32.png", "icons/icon-48.png", "icons/icon-128.png",
+    "icons/icon-16.png", "icons/icon-32.png", "icons/icon-48.png", "icons/icon-128.png", "icons/mark.svg",
 ]
 
 
@@ -31,22 +31,28 @@ def in_round_rect(x: float, y: float) -> bool:
     return (x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2
 
 
+def distance_to_segment(x: float, y: float, ax: float, ay: float, bx: float, by: float) -> float:
+    length = (bx - ax) ** 2 + (by - ay) ** 2
+    amount = max(0.0, min(1.0, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / length))
+    return math.hypot(x - (ax + amount * (bx - ax)), y - (ay + amount * (by - ay)))
+
+
 def color_at(x: float, y: float):
     if not in_round_rect(x, y):
         return (0, 0, 0, 0)
-    background = (23, 58, 105, 255)
-    white = (250, 253, 255, 255)
-    aqua = (94, 226, 210, 255)
-    if 0.22 < x < 0.32 and 0.20 < y < 0.78:
-        return white
-    if 0.22 < x < 0.62 and 0.67 < y < 0.78:
-        return white
-    distance = math.hypot(x - 0.62, y - 0.40)
-    if 0.16 < distance < 0.22:
-        return aqua
-    if 0.70 < x < 0.87 and abs((y - 0.57) - (x - 0.70)) < 0.045:
-        return aqua
-    return background
+    x *= 48
+    y *= 48
+    if math.hypot(x - 28.1, y - 25.7) <= 2.4:
+        return (201, 137, 100, 255)
+    segments = [
+        (8.5, 36.5, 8.5, 11.2), (8.5, 11.2, 12.5, 7.2),
+        (12.5, 7.2, 31.8, 7.2), (8.5, 36.5, 24.3, 36.5),
+        (15, 16.8, 24.2, 16.8), (15, 22.6, 20.5, 22.6),
+        (34.9, 32.5, 42.1, 39.7),
+    ]
+    if any(distance_to_segment(x, y, *line) <= 1.35 for line in segments) or abs(math.hypot(x - 28.1, y - 25.7) - 9.3) <= 1.35:
+        return (250, 248, 238, 255)
+    return (25, 70, 58, 255)
 
 
 def write_icon(size: int) -> None:

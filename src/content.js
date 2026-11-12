@@ -311,9 +311,9 @@
       .banner { position:fixed; right:12px; bottom:12px; max-width:min(400px,calc(100vw - 24px)); background:#fffdf0; color:#15243c; border:1px solid #b8a866; border-radius:9px; padding:10px 12px; box-shadow:0 5px 20px #14203b33; }
       :host([data-floating="true"]) .banner { right:76px; }
       .banner button { margin-left:8px; }
-      .float-button { position:fixed; z-index:2147483646; right:16px; width:48px; height:48px; padding:0; border:1px solid #c9ddca; border-radius:15px 15px 15px 5px; background:linear-gradient(145deg,#245c4a,#153d34); color:#f8f5e9; box-shadow:0 5px 0 #a8bdb050,0 12px 25px #173a3040; font:700 20px/1 Georgia,"Songti SC",serif; touch-action:none; user-select:none; transition:background .2s ease,box-shadow .2s ease,transform .2s ease; }
-      .float-button::after { content:""; position:absolute; top:8px; right:7px; width:5px; height:5px; border-radius:50%; background:#b9daa9; }
-      .float-button:hover,.float-button[aria-expanded="true"] { background:#276650; box-shadow:0 6px 0 #a8bdb050,0 15px 28px #173a3050; transform:translateY(-2px); }
+      .float-button { display:grid; place-items:center; position:fixed; z-index:2147483646; right:16px; width:48px; height:48px; padding:6px; border:1px solid #bfd0c0; border-radius:50%; background:#fbfaf3; box-shadow:0 0 0 4px #fbfaf3b8,0 9px 22px #173a3035; touch-action:none; user-select:none; transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease; }
+      .float-button img { display:block; width:100%; height:100%; pointer-events:none; }
+      .float-button:hover,.float-button[aria-expanded="true"] { border-color:#b96343; box-shadow:0 0 0 4px #fbfaf3db,0 12px 27px #173a3045; transform:translateY(-2px); }
       .float-button:active { transform:translateY(0) scale(.97); }
       .float-menu { position:fixed; z-index:2147483646; right:76px; width:min(302px,calc(100vw - 88px)); max-height:calc(100dvh - 24px); overflow:auto; overscroll-behavior:contain; padding:0 16px 13px; border:1px solid #d0d8cb; border-radius:16px; background:#f8f8f2; color:#193b32; box-shadow:0 17px 45px #142b2540,0 2px 7px #142b251a; font:13px/1.4 system-ui,-apple-system,"PingFang SC",sans-serif; animation:float-menu-enter .2s ease-out both; }
       .float-menu button:focus-visible,.float-menu select:focus-visible,.float-menu input:focus-visible,.float-button:focus-visible { outline:2px solid #a95d3e; outline-offset:2px; }
@@ -336,6 +336,7 @@
       .float-menu .float-actions button:first-child:hover { background:#a95737; }
       .float-menu .float-hint { margin:10px 0 0; color:#718277; font-size:10px; line-height:1.45; }
       @keyframes float-menu-enter { from { opacity:0; transform:translateY(6px) scale(.985); } to { opacity:1; transform:none; } }
+      @media (max-width:420px) { .float-menu label:has(select) { align-items:stretch; flex-direction:column; gap:5px; padding:7px 0; } .float-menu select { max-width:100%; width:100%; } }
       @media (prefers-reduced-motion:reduce) { .float-button,.float-menu,.float-menu input[type="checkbox"],.float-menu input[type="checkbox"]::after,.float-menu .float-actions button { animation:none; transition:none; } }
       .reader { position:fixed; inset:0; overflow:auto; background:#f8f7f2; color:#17263a; z-index:2; }
       .reader-head { position:sticky; top:0; background:#fff; border-bottom:1px solid #ccd3dd; padding:12px max(20px,calc((100vw - 760px)/2)); display:flex; gap:12px; align-items:center; justify-content:space-between; }
@@ -446,7 +447,10 @@
     const button = document.createElement('button');
     button.className = 'float-button';
     button.type = 'button';
-    button.textContent = '译';
+    const mark = document.createElement('img');
+    mark.src = api.runtime.getURL('icons/mark.svg');
+    mark.alt = '';
+    button.append(mark);
     button.setAttribute('aria-label', 'LexLens 快捷设置，可上下拖动');
     button.setAttribute('aria-expanded', 'false');
     button.title = 'LexLens 快捷设置 · 上下拖动调整位置';
