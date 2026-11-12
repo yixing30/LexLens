@@ -32,6 +32,8 @@
   let floatingButtonEnabled = false;
   let floatingButtonY = 1;
   let suppressFloatingClick = false;
+  let readerFontSize = 20;
+  let readerTheme = 'light';
 
   function siteDisabled() { return settings.disabledSites.includes(siteHostname); }
   function topHostname() {
@@ -359,13 +361,44 @@
       @keyframes float-menu-enter { from { opacity:0; transform:translateY(6px) scale(.985); } to { opacity:1; transform:none; } }
       @media (max-width:420px) { .float-menu label:has(select) { align-items:stretch; flex-direction:column; gap:5px; padding:7px 0; } .float-menu select { max-width:100%; width:100%; } }
       @media (prefers-reduced-motion:reduce) { .float-button,.float-menu,.float-menu input[type="checkbox"],.float-menu input[type="checkbox"]::after,.float-menu .float-actions button { animation:none; transition:none; } }
-      .reader { position:fixed; inset:0; overflow:auto; background:#f8f7f2; color:#17263a; z-index:2; }
-      .reader-head { position:sticky; top:0; background:#fff; border-bottom:1px solid #ccd3dd; padding:12px max(20px,calc((100vw - 760px)/2)); display:flex; gap:12px; align-items:center; justify-content:space-between; }
-      .reader-main { max-width:760px; margin:auto; padding:16px 20px 80px; font:20px/2.2 system-ui,-apple-system,sans-serif; }
-      .reader-main p { margin:0 0 1.15em; white-space:pre-wrap; overflow-wrap:anywhere; }
-      .reader-main ruby { ruby-position:over; cursor:pointer; }
-      .reader-main rt { font-size:10px; color:#17448f; background:#fffdf0; white-space:nowrap; }
+      .reader { --paper:#f7f4ec; --ink:#233b31; --muted:#67776b; --line:#d9ded2; --accent:#a55438; --gloss:#fdf6e6; --reader-size:20px; position:fixed; inset:0; z-index:2147483647; overflow-y:auto; overscroll-behavior:contain; background:var(--paper); color:var(--ink); font-family:Georgia,"Iowan Old Style","Songti SC",serif; scroll-behavior:smooth; }
+      .reader[data-theme="dark"] { --paper:#172720; --ink:#f1eee1; --muted:#abbcaf; --line:#3b5043; --accent:#e4a07d; --gloss:#364435; }
+      .reader-head { position:sticky; top:0; z-index:4; display:flex; align-items:center; justify-content:space-between; gap:18px; min-height:64px; padding:8px clamp(18px,4vw,64px); border-bottom:1px solid var(--line); background:var(--paper); font-family:system-ui,-apple-system,"PingFang SC",sans-serif; }
+      .reader-brand { display:flex; align-items:center; gap:10px; min-width:0; font-size:12px; font-weight:800; letter-spacing:.17em; }
+      .reader-brand::before { content:"L"; display:grid; place-items:center; width:29px; height:29px; border-radius:8px; background:var(--ink); color:var(--paper); font:italic 700 22px/1 Georgia,serif; letter-spacing:-.08em; }
+      .reader-brand small { display:block; margin-top:2px; color:var(--muted); font-size:9px; font-weight:600; letter-spacing:.13em; }
+      .reader-tools { display:flex; align-items:center; gap:7px; }
+      .reader-tools button { min-width:34px; min-height:32px; padding:4px 8px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); font:600 13px/1 system-ui,-apple-system,sans-serif; }
+      .reader-tools button:hover { border-color:var(--accent); color:var(--accent); }
+      .reader-tools button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+      .reader-tools .reader-close { margin-left:8px; padding:7px 12px; background:var(--ink); border-color:var(--ink); color:var(--paper); white-space:nowrap; }
+      .reader-tools .reader-close:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+      .reader-progress { position:absolute; right:0; bottom:-1px; left:0; height:2px; background:var(--accent); transform:scaleX(0); transform-origin:left; }
+      .reader-main { width:min(100%,820px); margin:auto; padding:0 clamp(22px,5vw,55px) 120px; }
+      .reader-hero { padding:clamp(55px,8vw,105px) 0 38px; border-bottom:1px solid var(--line); }
+      .reader-kicker { display:flex; align-items:center; gap:9px; margin:0 0 23px; color:var(--accent); font:700 11px/1.4 system-ui,-apple-system,sans-serif; letter-spacing:.18em; text-transform:uppercase; }
+      .reader-kicker::before { content:""; display:inline-block; width:26px; height:1px; background:currentColor; }
+      .reader-hero h1 { margin:0; color:var(--ink); font:600 clamp(38px,5.4vw,67px)/1.13 Georgia,"Iowan Old Style","Songti SC",serif; letter-spacing:-.045em; overflow-wrap:anywhere; }
+      .reader-meta { display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:27px; color:var(--muted); font:11px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif; letter-spacing:.04em; }
+      .reader-meta span+span::before { content:"·"; margin-right:19px; color:var(--accent); }
+      .reader-body { padding-top:38px; font:var(--reader-size)/1.92 Georgia,"Iowan Old Style","Songti SC",serif; letter-spacing:.005em; }
+      .reader-body p,.reader-body li { margin:0 0 1.3em; overflow-wrap:anywhere; }
+      .reader-body h2,.reader-body h3,.reader-body h4 { margin:2.2em 0 .75em; color:var(--ink); line-height:1.25; letter-spacing:-.03em; }
+      .reader-body h2 { font-size:1.5em; }
+      .reader-body h3 { font-size:1.2em; }
+      .reader-body h4 { font-size:1.05em; }
+      .reader-body blockquote { margin:1.8em 0; padding:.2em 0 .2em 1.2em; border-left:3px solid var(--accent); color:var(--muted); font-style:italic; }
+      .reader-body blockquote p { margin:0; }
+      .reader-body ol,.reader-body ul { margin:0 0 1.3em; padding-left:1.5em; }
+      .reader-body li { padding-left:.2em; }
+      .reader-body ruby { ruby-position:over; cursor:pointer; }
+      .reader-body rt { color:var(--accent); background:var(--gloss); font:650 .5em/1.1 system-ui,-apple-system,"PingFang SC",sans-serif; white-space:nowrap; }
+      .reader-empty { padding:50px 0; color:var(--muted); font:15px/1.7 system-ui,sans-serif; }
+      .reader-end { display:flex; align-items:center; gap:18px; margin-top:55px; color:var(--muted); font:700 10px/1.5 system-ui,sans-serif; letter-spacing:.16em; }
+      .reader-end::before { content:""; flex:1; height:1px; background:var(--line); }
       .reader .panel { z-index:3; }
+      @media (max-width:600px) { .reader-head { min-height:58px; } .reader-brand small { display:none; } .reader-tools { gap:4px; } .reader-tools .reader-close { margin-left:2px; } .reader-hero { padding-top:48px; } .reader-body { line-height:1.85; } }
+      @media (prefers-reduced-motion:reduce) { .reader { scroll-behavior:auto; } }
       @media (max-width:600px) {
         .panel { left:0 !important; right:0; top:auto !important; bottom:0; width:100vw; max-height:72dvh; border-radius:16px 16px 0 0; padding:18px 18px max(18px,env(safe-area-inset-bottom)); font-size:16px; }
         .panel .translation,.panel .primary-gloss { font-size:17px; }
@@ -1062,25 +1095,46 @@
     }
     shadow?.querySelector('.banner[data-kind="layout"]')?.remove();
   }
-  function readingBlocks() {
-    const groups = new Map();
-    const roots = [document.body, ...[...observedRoots].filter(root => root.host?.isConnected)];
-    for (const root of roots) {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      while (walker.nextNode()) {
-        const node = walker.currentNode;
-        const parent = node.parentElement;
-        if (!parent || !node.textContent || parent.closest('rt,#lexlens-ui-host')) continue;
-        const block = parent.closest('p,h1,h2,h3,h4,h5,h6,li,td,th,blockquote,figcaption,button,a,label') || parent;
-        if (parent.closest(SKIP.replace(',rt', '').replace(',ruby:not(.lexlens-mark)', ''))) {
-          if (node.textContent.trim()) groups.set(block, (groups.get(block) || '') + '\0');
-          continue;
-        }
-        if (!parent.getClientRects().length) continue;
-        groups.set(block, (groups.get(block) || '') + node.textContent);
-      }
+  const READER_SKIP = 'nav,aside,footer,[role="navigation"],[role="complementary"],form,button,script,style,noscript,svg,canvas,rt,[aria-hidden="true"],[hidden],#lexlens-ui-host';
+  function readingText(element) {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    let result = '';
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (!node.parentElement?.closest(READER_SKIP)) result += node.textContent;
     }
-    return [...groups.values()].flatMap(x => x.split('\0').map(part => part.trim()).filter(Boolean));
+    return result.replace(/\s+/g, ' ').trim();
+  }
+  function readingBlocks() {
+    const candidates = [...document.querySelectorAll('article,main,[role="main"],[itemprop="articleBody"],#main-content,.article-content,.post-content,.entry-content')];
+    let root = document.body;
+    let best = -Infinity;
+    for (const candidate of candidates) {
+      if (!candidate.getClientRects().length || candidate.closest(READER_SKIP)) continue;
+      const paragraphs = [...candidate.querySelectorAll('p')].filter(p => p.getClientRects().length && !p.closest(READER_SKIP));
+      const prose = paragraphs.reduce((length, p) => length + (readingText(p).length >= 55 ? readingText(p).length : 0), 0);
+      if (paragraphs.length < 2 || prose < 300) continue;
+      const total = readingText(candidate).length;
+      const links = [...candidate.querySelectorAll('a')].reduce((length, a) => length + readingText(a).length, 0);
+      const score = prose * 1.5 + paragraphs.length * 30 - Math.max(0, total - prose) * .7 - links * .25;
+      if (score > best) { best = score; root = candidate; }
+    }
+    const items = [...root.querySelectorAll('h1,h2,h3,h4,h5,h6,p,blockquote,li,figcaption')];
+    const blocks = [];
+    for (const element of items) {
+      if (!element.getClientRects().length || element.closest(READER_SKIP)) continue;
+      if (element.closest('blockquote') && element.tagName !== 'BLOCKQUOTE') continue;
+      if (element.closest('li') && element.tagName !== 'LI') continue;
+      const text = readingText(element);
+      if (!text || (element.tagName === 'LI' && text.length < 3)) continue;
+      const links = [...element.querySelectorAll('a')].reduce((length, a) => length + readingText(a).length, 0);
+      if (text.length < 240 && links / text.length > .8) continue;
+      blocks.push({ tag: element.tagName.toLowerCase(), text, list: element.tagName === 'LI' ? element.parentElement : null });
+      if (blocks.length >= 600) break;
+    }
+    const firstHeading = blocks.find(block => block.tag === 'h1' && block.text.length >= 8);
+    const title = firstHeading?.text || document.title?.replace(/\s*[|—–-]\s*[^|—–-]+$/, '').trim() || location.hostname;
+    return { title, blocks: blocks.filter(block => block !== firstHeading) };
   }
   function appendAnnotated(parent, text) {
     const found = siteDisabled() ? [] : core.candidates(text, settings, records);
@@ -1095,17 +1149,57 @@
   function openReader() {
     ensureUi(); closeDetail(); closeFloatingMenu();
     shadow.querySelector('.reader')?.remove();
-    const blocks = readingBlocks();
+    const { title, blocks } = readingBlocks();
     const reader = document.createElement('div'); reader.className = 'reader'; reader.setAttribute('role', 'dialog'); reader.setAttribute('aria-label', '独立阅读视图');
-    const head = document.createElement('div'); head.className = 'reader-head';
-    const title = document.createElement('strong'); title.textContent = `${document.title || '当前网页'} · 独立阅读视图`;
-    const close = document.createElement('button'); close.textContent = '返回网页'; close.onclick = () => reader.remove();
-    head.append(title, close);
+    reader.dataset.theme = readerTheme;
+    reader.style.setProperty('--reader-size', `${readerFontSize}px`);
+    const head = document.createElement('header'); head.className = 'reader-head';
+    const brand = document.createElement('div'); brand.className = 'reader-brand'; brand.innerHTML = '<span>LEX LENS<small>READING ROOM</small></span>';
+    const tools = document.createElement('div'); tools.className = 'reader-tools';
+    const smaller = document.createElement('button'); smaller.textContent = 'A−'; smaller.title = '缩小正文字号'; smaller.setAttribute('aria-label', '缩小正文字号');
+    const larger = document.createElement('button'); larger.textContent = 'A+'; larger.title = '放大正文字号'; larger.setAttribute('aria-label', '放大正文字号');
+    smaller.onclick = () => { readerFontSize = Math.max(16, readerFontSize - 2); reader.style.setProperty('--reader-size', `${readerFontSize}px`); };
+    larger.onclick = () => { readerFontSize = Math.min(28, readerFontSize + 2); reader.style.setProperty('--reader-size', `${readerFontSize}px`); };
+    const theme = document.createElement('button'); theme.textContent = '◐'; theme.title = '切换明暗阅读背景'; theme.setAttribute('aria-label', '切换明暗阅读背景');
+    theme.onclick = () => { readerTheme = readerTheme === 'dark' ? 'light' : 'dark'; reader.dataset.theme = readerTheme; };
+    const close = document.createElement('button'); close.className = 'reader-close'; close.textContent = '返回网页'; close.onclick = () => reader.remove();
+    tools.append(smaller, larger, theme, close);
+    const progress = document.createElement('div'); progress.className = 'reader-progress'; progress.setAttribute('aria-hidden', 'true');
+    head.append(brand, tools, progress);
     const main = document.createElement('main'); main.className = 'reader-main';
-    const note = document.createElement('p'); note.className = 'meta';
-    note.textContent = '仅展示此页可读取的文字；图片、画布及嵌入内容不在阅读视图中。'; main.append(note);
-    for (const text of blocks) { const p = document.createElement('p'); appendAnnotated(p, text); main.append(p); }
-    reader.append(head, main); shadow.append(reader); close.focus();
+    const hero = document.createElement('div'); hero.className = 'reader-hero';
+    const kicker = document.createElement('p'); kicker.className = 'reader-kicker'; kicker.textContent = '独立阅读 · ' + location.hostname.replace(/^www\./, '');
+    const heading = document.createElement('h1'); heading.textContent = title;
+    const meta = document.createElement('div'); meta.className = 'reader-meta';
+    const wordCount = blocks.reduce((count, block) => count + (block.text.match(/\b[\w'-]+\b/g)?.length || 0), 0);
+    for (const label of [`约 ${Math.max(1, Math.ceil(wordCount / 240))} 分钟`, '仅保留网页可读取文字', '词义标注依据当前等级']) {
+      const part = document.createElement('span'); part.textContent = label; meta.append(part);
+    }
+    hero.append(kicker, heading, meta);
+    const body = document.createElement('article'); body.className = 'reader-body';
+    let list = null; let listParent = null;
+    for (const block of blocks) {
+      if (block.tag === 'li') {
+        if (block.list !== listParent) {
+          listParent = block.list;
+          list = document.createElement(block.list?.tagName === 'OL' ? 'ol' : 'ul');
+          body.append(list);
+        }
+        const item = document.createElement('li'); appendAnnotated(item, block.text); list.append(item);
+        continue;
+      }
+      list = null; listParent = null;
+      const tag = /^h[1-6]$/.test(block.tag) ? `h${Math.min(4, Math.max(2, Number(block.tag[1])))}` : block.tag === 'blockquote' ? 'blockquote' : 'p';
+      const element = document.createElement(tag); appendAnnotated(element, block.text); body.append(element);
+    }
+    if (!blocks.length) { const empty = document.createElement('p'); empty.className = 'reader-empty'; empty.textContent = '此页没有可提取的连续正文。请返回网页原位阅读。'; body.append(empty); }
+    const end = document.createElement('div'); end.className = 'reader-end'; end.textContent = 'END OF READING';
+    main.append(hero, body, end); reader.append(head, main); shadow.append(reader);
+    reader.addEventListener('scroll', () => {
+      const extent = reader.scrollHeight - reader.clientHeight;
+      progress.style.transform = `scaleX(${extent > 0 ? Math.min(1, reader.scrollTop / extent) : 1})`;
+    }, { passive: true });
+    close.focus();
   }
   document.addEventListener('click', event => {
     const ruby = event.target.closest?.('.lexlens-mark');
