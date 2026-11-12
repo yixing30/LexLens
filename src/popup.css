@@ -9,7 +9,7 @@
 body { margin: 0; }
 button, select { font: inherit; }
 button { cursor: pointer; }
-button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+button:focus-visible, select:focus-visible, input:focus-visible {
   outline: 2px solid #b7613e;
   outline-offset: 3px;
 }
@@ -69,8 +69,9 @@ body.popup { width: 380px; max-height: 600px; overflow-y: auto; }
 .rescan-button:hover { background: #ffffff25; }
 .rescan-button:hover span { transform: rotate(50deg); }
 
-.profile-card { margin-top: 17px; padding-top: 13px; border-top: 1px solid #b5c8b8; }
-.profile-card .eyebrow { color: #658073; }
+.profile-card, .site-card { margin-top: 17px; padding-top: 13px; border-top: 1px solid #b5c8b8; }
+.profile-card .eyebrow, .site-card .eyebrow { color: #658073; }
+.site-card { margin-top: 14px; }
 .language-tag { color: #a85d40; font: 700 9px/1 system-ui, sans-serif; letter-spacing: .12em; }
 .profile-main-row { min-height: 67px; gap: 10px; border-bottom: 1px solid #d9e1d7; }
 .profile-main-row > div { flex: 1 1 auto; min-width: 0; }
@@ -81,6 +82,7 @@ body.popup { width: 380px; max-height: 600px; overflow-y: auto; }
 .control-row { min-height: 38px; gap: 10px; border-bottom: 1px solid #d9e1d7; font-size: 12px; font-weight: 600; }
 .control-row label { flex: none; white-space: nowrap; }
 .control-row select { flex: 0 1 auto; width: 122px; max-width: 51%; }
+#english-evidence { width: 140px; }
 .switch { appearance: none; position: relative; flex: none; width: 35px; height: 21px; margin: 0; border: 1px solid #b7c8b8; border-radius: 22px; background: #d8e0d7; cursor: pointer; transition: background .2s, border-color .2s; }
 .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fffefa; box-shadow: 0 1px 2px #0002; transition: transform .2s; }
 .switch:checked { border-color: #255e48; background: #255e48; }
@@ -94,18 +96,8 @@ body.popup { width: 380px; max-height: 600px; overflow-y: auto; }
 .reading-button:active:not(:disabled) { transform: translateY(0) scale(.99); }
 .reading-button:disabled { opacity: .45; cursor: not-allowed; }
 
-.advanced-card { margin-top: 10px; border-top: 1px solid #c9d6c9; border-bottom: 1px solid #c9d6c9; }
-.advanced-card summary { display: flex; align-items: center; gap: 8px; min-height: 42px; cursor: pointer; list-style: none; color: #315d49; font-size: 12px; font-weight: 700; }
-.advanced-card summary::-webkit-details-marker { display: none; }
-.advanced-card summary:hover { color: #a65639; }
-.advanced-count { flex: 1; text-align: right; color: #899a8b; font-size: 10px; font-weight: 400; }
-.summary-arrow { font-size: 16px; line-height: 1; transition: transform .2s; }
-.advanced-card[open] .summary-arrow { transform: rotate(45deg); }
-.advanced-content { padding: 3px 0 7px; border-top: 1px solid #d9e1d7; }
-.advanced-content .control-row { min-height: 43px; }
-.advanced-content .evidence-row { flex-direction: column; align-items: stretch; gap: 6px; padding: 9px 0; }
-.advanced-content .evidence-row select { width: 100%; max-width: 100%; }
-.helper { margin: 0 0 9px; color: #6b7f70; font-size: 10px; line-height: 1.45; }
+.helper { margin: 5px 0 6px; color: #6b7f70; font-size: 10px; line-height: 1.45; }
+.site-card .card-heading + .control-row { margin-top: 6px; }
 .site-name { overflow-wrap: anywhere; }
 .secondary-actions { justify-content: center; gap: 8px; margin-top: 9px; color: #a8b4a9; }
 .secondary-actions button { padding: 4px 2px; border: 0; background: transparent; color: #61796b; font-size: 11px; }
@@ -119,10 +111,9 @@ body.popup { width: 380px; max-height: 600px; overflow-y: auto; }
 @keyframes status-pulse { 50% { opacity: .5; box-shadow: 0 0 0 5px #b6dc9c16; } }
 @media (max-width: 380px) {
   .popup-shell { padding-right: 17px; padding-left: 17px; }
-  .advanced-count { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .page-card { animation: none; }
   .live-mark:has(#live-state[data-state="working"]) span:first-child { animation: none; }
-  .reading-button, .switch, .switch::after, .summary-arrow, .rescan-button span { transition: none; }
+  .reading-button, .switch, .switch::after, .rescan-button span { transition: none; }
 }

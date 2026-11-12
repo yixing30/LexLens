@@ -54,25 +54,25 @@
           <label for="density">标注密度</label>
           <select id="density"><option value="light">少量提示</option><option value="standard">标准</option><option value="all">全部标注</option></select>
         </div>
+        <div class="control-row">
+          <label for="english-evidence">等级依据</label>
+          <select id="english-evidence"><option value="sourced">词表分级</option><option value="estimated">包含粗略估计</option></select>
+        </div>
+        <p class="helper">粗略估计按本地词频增加释义，非正式 CEFR 分级。</p>
+        <div class="control-row"><label for="include-current-level">也显示所选等级词汇</label><input id="include-current-level" class="switch" type="checkbox"></div>
+      </section>
+
+      <section class="site-card" aria-labelledby="site-heading">
+        <div class="card-heading"><h2 id="site-heading" class="eyebrow">03 / 网站与工具</h2><span class="language-tag">ON THIS PAGE</span></div>
+        <div class="control-row"><label for="site-off">关闭此网站标注</label><input id="site-off" class="switch" type="checkbox"></div>
+        <p id="site-label" class="helper site-name"></p>
+        <div class="control-row"><label for="floating-button">网页浮动按钮</label><input id="floating-button" class="switch" type="checkbox"></div>
+        <p class="helper">开启后可在网页右侧拖动按钮，快速访问阅读设置。</p>
       </section>
 
       <div class="popup-actions">
         <button id="reading" class="reading-button" type="button"><span>打开独立阅读视图</span><span aria-hidden="true">↗</span></button>
       </div>
-
-      <details class="advanced-card">
-        <summary><span>更多设置</span><span class="advanced-count">等级依据 · 网站 · 浮动按钮</span><span class="summary-arrow" aria-hidden="true">↗</span></summary>
-        <div class="advanced-content">
-          <div class="control-row evidence-row"><label for="english-evidence">等级依据</label><select id="english-evidence"><option value="sourced">词表分级</option><option value="estimated">包含粗略估计</option></select></div>
-          <p class="helper">粗略估计会按本地词频增加释义，非正式 CEFR 分级。</p>
-          <div class="control-row"><label for="include-current-level">也显示所选等级</label><input id="include-current-level" class="switch" type="checkbox"></div>
-          <p class="helper">适合当前等级仍有陌生词时使用。</p>
-          <div class="control-row"><label for="site-off">关闭此网站标注</label><input id="site-off" class="switch" type="checkbox"></div>
-          <p id="site-label" class="helper site-name"></p>
-          <div class="control-row"><label for="floating-button">网页浮动按钮</label><input id="floating-button" class="switch" type="checkbox"></div>
-          <p class="helper">显示在网页右下角，可上下拖动。</p>
-        </div>
-      </details>
 
       <div class="secondary-actions"><button id="selftest" type="button">标注自检</button><span aria-hidden="true">·</span><button id="options" type="button">个人记录与说明</button></div>
 

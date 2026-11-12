@@ -130,12 +130,6 @@
     api.tabs.create({ url: api.runtime.getURL('src/selftest.html') });
     window.close();
   });
-  const advanced = document.querySelector?.('.advanced-card');
-  advanced?.addEventListener('toggle', () => {
-    if (advanced.open) advanced.scrollIntoView({
-      block: 'start', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-    });
-  });
   document.getElementById('check-page').addEventListener('click', () => {
     if (!tabId) return;
     rescanAttempted = true;
