@@ -45,7 +45,7 @@ test('opening the popup starts annotation when the page has no content script', 
   await new Promise(resolve => setTimeout(resolve, 10));
   assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
     ['css', ['src/content.css']],
-    ['js', ['data/english-levels.js', 'data/english-inline.js', 'data/english-auto.js', 'src/core.js', 'src/content.js']]
+    ['js', ['data/english-levels.js', 'data/english-inline.js', 'data/english-auto.js', 'src/core.js', 'src/grammar.js', 'src/content.js']]
   ]);
   assert.equal(messages, 2);
   assert.equal(element('marked-count').textContent, '3');

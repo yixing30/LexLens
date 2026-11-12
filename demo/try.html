@@ -48,7 +48,7 @@
     let data={settings:{enabled:{en:true,ja:true,ko:true},levels:{en:'B1',ja:'N3',ko:'3'},density:'standard',disabledSites:[]},records:{}};
     window.browser={storage:{local:{get:(_keys,done)=>done(data),set:(changes,done)=>{const event={};for(const [key,value] of Object.entries(changes)){event[key]={oldValue:data[key],newValue:value};data[key]=value}for(const listener of listeners)listener(event,'local');done?.()}},onChanged:{addListener:fn=>listeners.push(fn)}},runtime:{onMessage:{addListener:fn=>messageListeners.push(fn)}}};
   </script>
-  <script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/content.js"></script>
+  <script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/grammar.js"></script><script src="../src/content.js"></script>
   <script>
     for(const lang of Object.keys(LexLensCore.LEVELS)){
       const select=document.getElementById(`${lang}-level`);

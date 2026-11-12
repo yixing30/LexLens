@@ -6,7 +6,7 @@
   const listeners=[];let onMessage;
   window.browser={storage:{local:{get:(_keys,done)=>done({}),set:(_value,done)=>done?.()},onChanged:{addListener:fn=>listeners.push(fn)}},runtime:{onMessage:{addListener:fn=>{onMessage=fn}}}};
 </script>
-<script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/content.js"></script>
+<script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/grammar.js"></script><script src="../src/content.js"></script>
 <script>
   window.onerror=(message)=>{document.getElementById('result').textContent='ERROR: '+message};
   setTimeout(()=>{

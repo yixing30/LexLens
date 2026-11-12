@@ -58,7 +58,7 @@
           Promise.resolve()
             .then(() => api.scripting.insertCSS({ target: { tabId }, files: ['src/content.css'] }))
             .then(() => api.scripting.executeScript({
-              target: { tabId }, files: ['data/english-levels.js', 'data/english-inline.js', 'data/english-auto.js', 'src/core.js', 'src/content.js']
+              target: { tabId }, files: ['data/english-levels.js', 'data/english-inline.js', 'data/english-auto.js', 'src/core.js', 'src/grammar.js', 'src/content.js']
             }))
             .then(() => checkPage())
             .catch(() => message('无法在此页启动 LexLens。请确认它是 Chrome 中的普通网页，并检查扩展的当前网站访问权限。'));

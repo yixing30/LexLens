@@ -2,6 +2,7 @@
   'use strict';
   const api = globalThis.chrome?.storage?.local ? globalThis.chrome : globalThis.browser;
   const core = globalThis.LexLensCore;
+  const grammar = globalThis.LexLensGrammar;
   if (!api?.storage?.local || !core || !document.documentElement) return;
   if (globalThis.__lexlensContentLoaded) return;
   globalThis.__lexlensContentLoaded = true;
@@ -302,6 +303,26 @@
       .panel .lookup-tabs { display:flex; gap:4px; border-bottom:1px solid #d8e0eb; margin:10px 0 12px; }
       .panel .lookup-tabs button { border:0; border-bottom:3px solid transparent; border-radius:0; color:#52617b; padding:7px 12px; }
       .panel .lookup-tabs button[aria-selected="true"] { color:#17448f; border-bottom-color:#17448f; font-weight:700; }
+      .panel.grammar-panel { background:#faf9f3; border-color:#c5d5c7; color:#193e32; }
+      .grammar-panel h2 { font:700 21px/1.25 Georgia,"Songti SC",serif; color:#19483a; }
+      .grammar-panel .close { border-color:#c4d3c4; color:#22543f; border-radius:50%; }
+      .grammar-panel .lookup-tabs { border-bottom-color:#d5e0d5; }
+      .grammar-panel .lookup-tabs button { color:#587365; }
+      .grammar-panel .lookup-tabs button[aria-selected="true"] { color:#205842; border-bottom-color:#b86343; }
+      .grammar-intro { margin:4px 0 12px !important; color:#687d70; font-size:12px; }
+      .grammar-sentence { padding:10px 0; border-top:1px solid #dce5db; }
+      .panel.grammar-panel .grammar-sentence summary { color:#245640; font-size:13px; line-height:1.45; overflow-wrap:anywhere; }
+      .grammar-sentence[open] summary { margin-bottom:9px; }
+      .grammar-original { max-height:none !important; margin:0 0 10px !important; color:#263f34 !important; font-size:14px; line-height:1.6; }
+      .grammar-outline { margin:8px 0 10px; padding:9px 10px; border:1px solid #d8e2d6; border-radius:8px; background:#fffefa; }
+      .grammar-outline strong { display:block; margin-bottom:4px; color:#245640; font-size:12px; }
+      .grammar-outline p { margin:3px 0; color:#405b4b; font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+      .grammar-outline b { color:#a35639; }
+      .grammar-finding { margin:8px 0; padding:8px 10px; border-left:3px solid #bc6845; border-radius:0 7px 7px 0; background:#f0f3eb; }
+      .grammar-finding strong { display:block; margin-bottom:3px; color:#184b39; font-size:13px; }
+      .grammar-finding .evidence { display:inline-block; margin-bottom:4px; color:#9f5639; font-size:12px; font-weight:700; overflow-wrap:anywhere; }
+      .grammar-finding p { margin:3px 0; color:#3f5a4a; font-size:12px; line-height:1.5; }
+      .grammar-empty { color:#61766a; font-size:12px; line-height:1.55; }
       .panel details { border-top:1px solid #e2e7ef; padding:8px 0; }
       .panel details summary { cursor:pointer; color:#17448f; font-weight:600; }
       .panel details[open] summary { margin-bottom:8px; }
@@ -679,6 +700,53 @@
       } else status.textContent = '此设备暂不支持浏览器本地英中翻译。';
     } catch (error) { status.textContent = `无法检查本地翻译能力：${error?.message || '未知错误'}`; }
   }
+  function showGrammar(text, container) {
+    const intro = document.createElement('p'); intro.className = 'grammar-intro';
+    intro.textContent = '按原文标出可辨认的语法线索；复杂句需结合上下文核对。分析仅在本机进行。';
+    container.append(intro);
+    const sentences = grammar?.analyze(text) || [];
+    if (!sentences.length) {
+      const empty = document.createElement('p'); empty.className = 'grammar-empty';
+      empty.textContent = '没有可分析的英文句子。'; container.append(empty);
+      return;
+    }
+    sentences.forEach((sentence, index) => {
+      const section = document.createElement(sentences.length > 1 ? 'details' : 'section');
+      section.className = 'grammar-sentence';
+      if (sentences.length > 1) {
+        section.open = index === 0;
+        const summary = document.createElement('summary');
+        summary.textContent = `句 ${index + 1} · ${sentence.text.slice(0, 76)}${sentence.text.length > 76 ? '…' : ''}`;
+        section.append(summary);
+      }
+      const original = document.createElement('p'); original.className = 'source-text grammar-original';
+      original.textContent = sentence.text; section.append(original);
+      if (sentence.outline) {
+        const outline = document.createElement('div'); outline.className = 'grammar-outline';
+        const title = document.createElement('strong'); title.textContent = '先拆句'; outline.append(title);
+        for (const part of sentence.outline) {
+          const row = document.createElement('p');
+          const label = document.createElement('b'); label.textContent = `${part.role} · `;
+          row.append(label, document.createTextNode(part.text)); outline.append(row);
+        }
+        section.append(outline);
+      }
+      if (!sentence.findings.length) {
+        const empty = document.createElement('p'); empty.className = 'grammar-empty';
+        empty.textContent = '未识别到足够明确的固定结构。可先找主要动作，再看修饰语与连接词。';
+        section.append(empty);
+      }
+      for (const finding of sentence.findings) {
+        const item = document.createElement('div'); item.className = 'grammar-finding';
+        const name = document.createElement('strong'); name.textContent = finding.name;
+        const evidence = document.createElement('span'); evidence.className = 'evidence'; evidence.textContent = `原文线索：${finding.evidence}`;
+        const explanation = document.createElement('p'); explanation.textContent = finding.explanation;
+        const reading = document.createElement('p'); reading.textContent = `阅读方法：${finding.reading}`;
+        item.append(name, evidence, explanation, reading); section.append(item);
+      }
+      container.append(section);
+    });
+  }
   async function openLookup(query, rect, profileItem = null, linkHref = null, example = '') {
     ensureUi();
     closeDetail();
@@ -686,8 +754,9 @@
     detail = document.createElement('section');
     detail.className = 'panel';
     detail.setAttribute('role', 'dialog');
-    detail.setAttribute('aria-label', '查词与翻译');
-    const heading = document.createElement('h2'); heading.textContent = word ? query : '原文翻译';
+    detail.setAttribute('aria-label', word ? '查词与翻译' : '语法与翻译');
+    if (!word) detail.classList.add('grammar-panel');
+    const heading = document.createElement('h2'); heading.textContent = word ? query : '语法与翻译';
     const close = document.createElement('button'); close.className = 'close'; close.textContent = '关闭'; close.setAttribute('aria-label', '关闭查询'); close.onclick = closeDetail;
     detail.append(close, heading);
     const dictionary = document.createElement('div');
@@ -697,12 +766,31 @@
     translateBox.id = 'lexlens-lookup-translation';
     translateBox.setAttribute('role', 'tabpanel');
     if (!word) {
+      const grammarBox = document.createElement('div'); grammarBox.id = 'lexlens-lookup-grammar'; grammarBox.setAttribute('role', 'tabpanel');
+      const tabs = document.createElement('div'); tabs.className = 'lookup-tabs'; tabs.setAttribute('role', 'tablist');
+      const grammarTab = document.createElement('button'); grammarTab.textContent = '语法'; grammarTab.setAttribute('role', 'tab'); grammarTab.setAttribute('aria-controls', grammarBox.id);
+      const transTab = document.createElement('button'); transTab.textContent = '翻译'; transTab.setAttribute('role', 'tab'); transTab.setAttribute('aria-controls', translateBox.id);
       const original = document.createElement('p'); original.className = 'source-text'; original.textContent = query;
-      detail.append(original, translateBox);
+      translateBox.append(original);
+      let translationStarted = false;
+      const selectTab = name => {
+        const isGrammar = name === 'grammar';
+        grammarTab.setAttribute('aria-selected', String(isGrammar));
+        transTab.setAttribute('aria-selected', String(!isGrammar));
+        grammarBox.hidden = !isGrammar;
+        translateBox.hidden = isGrammar;
+        detail.scrollTop = 0;
+        if (!isGrammar && !translationStarted) { translationStarted = true; void showTranslation(query, translateBox); }
+      };
+      grammarTab.onclick = () => selectTab('grammar');
+      transTab.onclick = () => selectTab('translation');
+      tabs.append(grammarTab, transTab);
+      detail.append(tabs, grammarBox, translateBox);
+      showGrammar(query, grammarBox);
+      selectTab('grammar');
       shadow.append(detail);
       positionPanel(detail, rect);
       close.focus();
-      void showTranslation(query, translateBox);
       return;
     }
     const pron = document.createElement('div'); pron.className = 'pronunciation';

@@ -17,7 +17,7 @@
   const shadowHost=document.createElement('div');shadowHost.id='shadow-host';document.body.append(shadowHost);
   shadowHost.attachShadow({mode:'open'}).innerHTML='<p>The abbey stood.</p><div id="shadow-dynamic"></div>';
 </script>
-<script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/content.js"></script>
+<script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/grammar.js"></script><script src="../src/content.js"></script>
 <script>
   setTimeout(()=>{
     const newText=document.createElement('p');newText.textContent='A meticulous new comment.';document.getElementById('dynamic').append(newText);

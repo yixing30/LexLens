@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "dist" / "LexLens-Chrome"
 FILES = [
     "manifest.json",
-    "src/background.js", "src/content.css", "src/content.js", "src/core.js",
+    "src/background.js", "src/content.css", "src/content.js", "src/core.js", "src/grammar.js",
     "src/options.html", "src/options.js", "src/popup.html", "src/popup.css", "src/popup.js", "src/selftest.html", "src/ui.css",
     "data/english-levels.js", "data/english-inline.js", "data/english-auto.js", "data/english-lookup.json", "data/english-detail.json",
     "data/ECDICT-LICENSE.txt", "data/NOTICE.md", "data/ENGLISH-LEVELS-NOTICE.md",
