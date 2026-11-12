@@ -13,6 +13,10 @@
   let rescanAttempted = false;
   const status = document.getElementById('status');
   const saveStatus = document.getElementById('save-status');
+  const markedCount = document.getElementById('marked-count');
+  const activeSite = document.getElementById('active-site');
+  const liveState = document.getElementById('live-state');
+  function connectionState(label) { liveState.textContent = label; }
   function message(text) { status.textContent = text; }
   function get(keys) { return new Promise(resolve => api.storage.local.get(keys, x => resolve(x || {}))); }
   function set(value) { return new Promise(resolve => api.storage.local.set(value, resolve)); }
@@ -28,12 +32,14 @@
     siteOff.checked = !!hostname && settings.disabledSites.includes(hostname);
     siteOff.disabled = !hostname;
     document.getElementById('site-label').textContent = hostname || '此页面不支持网站开关';
+    activeSite.textContent = hostname || '当前页面不可读取';
     document.getElementById('reading').disabled = !tabId;
   }
   function checkPage(attempt = 0) {
     if (!attempt) clearTimeout(pollTimer);
     const request = ++statusRequest;
     if (!tabId || (!/^https?:/.test(tabUrl) && tabUrl !== api.runtime.getURL('src/selftest.html'))) {
+      connectionState('此页不可用');
       message('此页面不支持扩展。请在 Chrome 中打开普通 http 或 https 网页。');
       return;
     }
@@ -42,6 +48,7 @@
       const failed = !!api.runtime.lastError || !response?.ok;
       if (request !== statusRequest) return;
       if (failed) {
+        connectionState('连接中');
         if (!activationAttempted && /^https?:/.test(tabUrl) && api.scripting) {
           activationAttempted = true;
           message('正在当前网页启动 LexLens…');
@@ -58,6 +65,8 @@
         return;
       }
       const counts = `上方释义 ${response.marked || 0} 处`;
+      markedCount.textContent = String(response.marked || 0);
+      connectionState(response.siteDisabled || !response.englishEnabled ? '已暂停' : response.scanning || !response.ready ? '扫描中' : '本机运行');
       if (!response.ready || response.scanning) {
         message(`LexLens 已连接，正在扫描网页（${counts}）…`);
         if (attempt < 20) pollTimer = setTimeout(() => checkPage(attempt + 1), 500);
@@ -77,7 +86,7 @@
           else pollTimer = setTimeout(() => checkPage(1), 500);
         });
       } else {
-        message('重新扫描后仍无标注。请检查英语开关、所选等级和网页文字是否可读取。');
+        message('仍无标注 · 请检查英语开关、等级或网页文字。');
       }
     });
   }

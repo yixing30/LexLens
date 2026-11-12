@@ -1,23 +1,87 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LexLens</title><link rel="stylesheet" href="ui.css"></head>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LexLens</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
 <body class="popup">
-  <h1>LexLens</h1>
-  <p class="muted">在可读取的英文网页上，按所选等级显示生词的上方中文释义。词典常见义可能与当前句义不同；点击词语可查看完整词典。</p>
-  <div class="card">
-    <div class="row"><strong>当前网页</strong><button id="check-page" type="button">重新扫描</button></div>
-    <p id="status" class="status" role="status" aria-live="polite">正在检测…</p>
+  <div class="popup-shell">
+    <header class="popup-header">
+      <div class="brand-lockup">
+        <span class="brand-symbol" aria-hidden="true"><span></span><span></span></span>
+        <div>
+          <span class="eyebrow">THE READING COMPANION</span>
+          <h1>Lex<span>Lens</span></h1>
+        </div>
+      </div>
+      <span class="edition" aria-label="英语版">EN / 01</span>
+    </header>
+
+    <p class="hero-line">让陌生词，<em>留在原句里。</em></p>
+
+    <main>
+      <section class="page-card" aria-labelledby="page-heading">
+        <div class="card-heading">
+          <h2 id="page-heading" class="eyebrow">当前网页 <span>/ LIVE PAGE</span></h2>
+          <span class="live-mark"><span aria-hidden="true"></span><span id="live-state">正在检测</span></span>
+        </div>
+        <div class="annotation-metric">
+          <strong id="marked-count" aria-label="上方释义数量">—</strong>
+          <div><span>处上方释义</span><small id="active-site">正在检测网页</small></div>
+        </div>
+        <div class="page-status-row">
+          <p id="status" class="status" role="status" aria-live="polite">正在检测…</p>
+          <button id="check-page" class="rescan-button" type="button" aria-label="重新扫描当前网页" title="重新扫描当前网页"><span aria-hidden="true">↻</span></button>
+        </div>
+      </section>
+
+      <section class="profile-card" aria-labelledby="profile-heading">
+        <div class="card-heading">
+          <h2 id="profile-heading" class="eyebrow">阅读设置 <span>/ PROFILE</span></h2>
+          <span class="language-tag">ENGLISH</span>
+        </div>
+        <div class="profile-main-row">
+          <div><label for="en-level" class="control-title">已掌握等级</label><p class="control-help">标注更高等级的生词</p></div>
+          <select id="en-level" aria-label="英语已掌握等级"></select>
+        </div>
+        <div class="control-row">
+          <label for="en-on">英语标注</label>
+          <input id="en-on" class="switch" type="checkbox">
+        </div>
+        <div class="control-row">
+          <label for="density">标注密度</label>
+          <select id="density"><option value="light">少量提示</option><option value="standard">标准</option><option value="all">全部标注</option></select>
+        </div>
+      </section>
+
+      <div class="popup-actions">
+        <button id="reading" class="reading-button" type="button"><span>打开独立阅读视图</span><span aria-hidden="true">↗</span></button>
+      </div>
+
+      <details class="advanced-card">
+        <summary><span>更多设置</span><span class="advanced-count">等级依据 · 网站 · 浮动按钮</span><span class="summary-arrow" aria-hidden="true">↗</span></summary>
+        <div class="advanced-content">
+          <div class="control-row evidence-row"><label for="english-evidence">等级依据</label><select id="english-evidence"><option value="sourced">词表分级</option><option value="estimated">包含粗略估计</option></select></div>
+          <p class="helper">粗略估计会按本地词频增加释义，非正式 CEFR 分级。</p>
+          <div class="control-row"><label for="include-current-level">也显示所选等级</label><input id="include-current-level" class="switch" type="checkbox"></div>
+          <p class="helper">适合当前等级仍有陌生词时使用。</p>
+          <div class="control-row"><label for="site-off">关闭此网站标注</label><input id="site-off" class="switch" type="checkbox"></div>
+          <p id="site-label" class="helper site-name"></p>
+          <div class="control-row"><label for="floating-button">网页浮动按钮</label><input id="floating-button" class="switch" type="checkbox"></div>
+          <p class="helper">显示在网页右下角，可上下拖动。</p>
+        </div>
+      </details>
+
+      <div class="secondary-actions"><button id="selftest" type="button">标注自检</button><span aria-hidden="true">·</span><button id="options" type="button">个人记录与说明</button></div>
+
+    </main>
+
+    <footer class="popup-footer"><span class="privacy-dot" aria-hidden="true"></span>词汇分析留在本机 <span aria-hidden="true">·</span> 网页文字不上传</footer>
+    <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
   </div>
-  <div class="card">
-    <div class="row"><label for="en-on">英语</label><span class="setting"><input id="en-on" type="checkbox"><select id="en-level" aria-label="英语已掌握等级"></select></span></div>
-    <div class="row"><label for="english-evidence">英语等级依据</label><select id="english-evidence"><option value="sourced">词表分级</option><option value="estimated">包含粗略估计</option></select></div>
-    <p class="muted">词表分级按词形和词性筛选；切换等级会重算当前网页。“包含粗略估计”会增加按词频估计的释义。</p>
-    <div class="row"><label for="include-current-level">也显示所选等级词汇</label><input id="include-current-level" type="checkbox"></div>
-    <p class="muted">若当前等级仍有陌生词，可开启此项；也可选中单词查词，再标记“仍不认识”。</p>
-    <div class="row"><label for="density">标注密度</label><select id="density"><option value="light">少量提示</option><option value="standard">标准</option><option value="all">全部标注</option></select></div>
-  </div>
-  <div class="card"><div class="row"><label for="site-off">当前网站关闭标注</label><input id="site-off" type="checkbox"></div><p id="site-label" class="muted"></p></div>
-  <div class="card"><div class="row"><label for="floating-button">网页浮动按钮</label><input id="floating-button" type="checkbox"></div><p class="muted">开启后显示在网页右下角。点击可快速调整标注或打开阅读视图；按住可上下拖动。</p></div>
-  <div class="actions"><button id="reading" class="primary">独立阅读视图</button><button id="selftest">打开标注自检页</button><button id="options">个人记录与说明</button></div>
-  <p id="save-status" class="muted" role="status"></p>
-  <script src="core.js"></script><script src="popup.js"></script>
-</body></html>
+  <script src="core.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
