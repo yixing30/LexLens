@@ -246,10 +246,7 @@
     shadow?.querySelector('.lookup-action')?.remove();
     shadow?.querySelector('.banner')?.remove();
     if (!siteDisabled()) { queueTree(document.body || document.documentElement); schedule(); }
-    else {
-      restore();
-      if (window === window.top) showBanner('此网站已关闭标注。可在扩展面板中重新开启。', false);
-    }
+    else restore();
     if (window === window.top && !siteDisabled() && document.querySelector('ruby:not(.lexlens-mark)')) showBanner('网页已有注音，原位叠加释义可能碰撞；请使用独立阅读视图。');
     if (readerOpen) openReader();
     syncFloatingMenu();
@@ -1088,10 +1085,7 @@
     observe();
     ready = true;
     syncFloatingButton();
-    if (siteDisabled()) {
-      if (window === window.top) showBanner('此网站已关闭标注。可在扩展面板中重新开启。', false);
-      return;
-    }
+    if (siteDisabled()) return;
     queueTree(document.body || document.documentElement); schedule();
     if (window === window.top && document.querySelector('ruby:not(.lexlens-mark)')) showBanner('网页已有注音，原位叠加释义可能碰撞；请使用独立阅读视图。');
   });
