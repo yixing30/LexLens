@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LexLens</title><link rel="stylesheet" href="ui.css"></head>
+<body class="popup">
+  <h1>LexLens</h1>
+  <p class="muted">在可读取的英文网页上，按所选等级显示生词的上方中文释义。词典常见义可能与当前句义不同；点击词语可查看完整词典。</p>
+  <div class="card">
+    <div class="row"><strong>当前网页</strong><button id="check-page" type="button">重新扫描</button></div>
+    <p id="status" class="status" role="status" aria-live="polite">正在检测…</p>
+  </div>
+  <div class="card">
+    <div class="row"><label for="en-on">英语</label><span class="setting"><input id="en-on" type="checkbox"><select id="en-level" aria-label="英语已掌握等级"></select></span></div>
+    <div class="row"><label for="english-evidence">英语等级依据</label><select id="english-evidence"><option value="sourced">词表分级</option><option value="estimated">包含粗略估计</option></select></div>
+    <p class="muted">词表分级按词形和词性筛选；切换等级会重算当前网页。“包含粗略估计”会增加按词频估计的释义。</p>
+    <div class="row"><label for="include-current-level">也显示所选等级词汇</label><input id="include-current-level" type="checkbox"></div>
+    <p class="muted">若当前等级仍有陌生词，可开启此项；也可选中单词查词，再标记“仍不认识”。</p>
+    <div class="row"><label for="density">标注密度</label><select id="density"><option value="light">少量提示</option><option value="standard">标准</option><option value="all">全部标注</option></select></div>
+  </div>
+  <div class="card"><div class="row"><label for="site-off">当前网站关闭标注</label><input id="site-off" type="checkbox"></div><p id="site-label" class="muted"></p></div>
+  <div class="card"><div class="row"><label for="floating-button">网页浮动按钮</label><input id="floating-button" type="checkbox"></div><p class="muted">开启后显示在网页右下角。点击可快速调整标注或打开阅读视图；按住可上下拖动。</p></div>
+  <div class="actions"><button id="reading" class="primary">独立阅读视图</button><button id="selftest">打开标注自检页</button><button id="options">个人记录与说明</button></div>
+  <p id="save-status" class="muted" role="status"></p>
+  <script src="core.js"></script><script src="popup.js"></script>
+</body></html>

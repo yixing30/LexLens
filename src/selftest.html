@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LexLens 标注自检</title>
+  <link rel="stylesheet" href="content.css">
+  <style>
+    body { max-width: 760px; margin: 40px auto; padding: 0 20px; color: #18263a; font: 20px/2.2 system-ui, sans-serif; }
+    h1 { font-size: 30px; }
+    .note { font-size: 15px; line-height: 1.7; color: #4b5e78; }
+    p.sample { padding: 14px 18px; background: #f4f7fc; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <h1>LexLens 标注自检</h1>
+  <p class="note">这是扩展自带的本地页面。在默认“英语开启、已掌握 B1、标准密度”设置下，下面多个英文词上方应出现中文释义。更改设置后，点击扩展图标的“当前网页”可查看标注数量。</p>
+  <p class="sample">AI has a ceiling.</p>
+  <p class="sample">A prompt for the model needs meticulous wording.</p>
+  <p class="note">如果这里有标注，而目标网站没有，请检查 Chrome 扩展详情中的网站访问权限并刷新目标网页。如果这里也没有标注，先检查英语开关和等级设置，再重新加载 LexLens 扩展。</p>
+  <script src="../data/english-levels.js"></script>
+  <script src="../data/english-inline.js"></script>
+  <script src="../data/english-auto.js"></script>
+  <script src="core.js"></script>
+  <script src="content.js"></script>
+</body>
+</html>

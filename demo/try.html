@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LexLens 交互演示</title>
+<link rel="stylesheet" href="../src/content.css">
+<style>
+  :root{font:17px/1.8 system-ui,-apple-system,sans-serif;color:#1b2a3e;background:#f6f8fb}
+  *{box-sizing:border-box}body{max-width:850px;margin:0 auto;padding:28px 20px 90px}
+  h1{line-height:1.3;margin:0 0 8px}h2{font-size:20px;margin-top:28px}
+  .note,.controls,.sample{background:#fff;border:1px solid #d6dfea;border-radius:14px;padding:18px 22px;margin:18px 0}
+  .note{background:#eef4ff}.controls{display:flex;gap:12px 20px;flex-wrap:wrap;align-items:center}
+  label{display:inline-flex;gap:6px;align-items:center}select,button{font:inherit;padding:5px 9px;border:1px solid #9aacc7;border-radius:7px;background:#fff;color:#17447e}
+  button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #1857ad;outline-offset:2px}
+  .small{color:#56647a;font-size:14px}.narrow{width:145px;border:1px solid #a4b0c1;padding:6px}
+  table{border-collapse:collapse}td{border:1px solid #b5c2d3;padding:10px}p{margin:12px 0}
+</style></head><body>
+  <h1>LexLens 交互演示</h1>
+  <div class="note">本页直接载入同一套本地标注脚本，无需先安装扩展。按英语等级在生词上方显示中文常见义；多义词仍需结合句子核对。点击词语可查看完整词典，也可选中其他词主动查询。</div>
+  <section class="controls" aria-label="演示设置">
+    <label><input id="en-on" type="checkbox" checked>英语 <select id="en-level" aria-label="英语等级"></select></label>
+    <label><input id="ja-on" type="checkbox" checked>日语 <select id="ja-level" aria-label="日语等级"></select></label>
+    <label><input id="ko-on" type="checkbox" checked>韩语 <select id="ko-level" aria-label="韩语等级"></select></label>
+    <label>密度 <select id="density"><option value="light">少量提示</option><option value="standard" selected>标准</option><option value="all">全部标注</option></select></label>
+    <button id="reader">独立阅读视图</button><button id="reset">清空个人记录</button>
+  </section>
+  <section class="sample">
+    <h2>正文与多义词</h2>
+    <p>The river bank flooded. I deposited money at the bank. The bank is nearby.</p>
+    <p>We ran out of time. The report has a subtle difference. Meticulous work requires patience.</p>
+    <p>The abbey stood beside an unfamiliar valley. Select “algorithm” in this sentence to query the dictionary: the algorithm changed.</p>
+    <p>A systematic methodology helps us understand the limits of every tool.</p>
+    <p>网页标签拆开的词组：We <em>ran</em> <strong>out</strong> of time.</p>
+    <p>网页标签拆开的句义：The river <strong>bank</strong> flooded.</p>
+    <p>A meticulous plan needs meticulous work. 点击其中一个“meticulous”并标记“已认识”，观察其他相同词义的标注一起消失。</p>
+    <h2>日语与韩语</h2>
+    <p>余儀なくされた変更は顕著な影響を与えた。複雑な問題を見積もった。</p>
+    <p>불가피한 결정으로 문제를 해결했다. 현저한 변화가 있었다.</p>
+    <h2>其他网页区域</h2>
+    <nav><a href="#target">Ubiquitous navigation link</a> · <button type="button">Nevertheless</button></nav>
+    <table><tr><td>Meticulous table text</td><td>複雑な表</td></tr></table>
+    <p class="narrow">Ubiquitous meticulous</p>
+    <h2>动态内容与排除区域</h2>
+    <button id="add" type="button">添加评论</button> <button id="remove" type="button">删除评论</button><div id="dynamic"></div>
+    <p>输入框和可编辑区域不应有标注：</p><input value="meticulous"><div contenteditable="true">Meticulous editable content</div><pre>meticulous code</pre>
+    <p id="target" class="small">导航链接的目标位置。</p>
+  </section>
+  <p class="small">图片、画布、PDF 和网页已有假名注音等复杂布局尚未纳入此演示。可在扩展面板中测试网站停用开关。</p>
+  <script>
+    const listeners=[]; const messageListeners=[];
+    let data={settings:{enabled:{en:true,ja:true,ko:true},levels:{en:'B1',ja:'N3',ko:'3'},density:'standard',disabledSites:[]},records:{}};
+    window.browser={storage:{local:{get:(_keys,done)=>done(data),set:(changes,done)=>{const event={};for(const [key,value] of Object.entries(changes)){event[key]={oldValue:data[key],newValue:value};data[key]=value}for(const listener of listeners)listener(event,'local');done?.()}},onChanged:{addListener:fn=>listeners.push(fn)}},runtime:{onMessage:{addListener:fn=>messageListeners.push(fn)}}};
+  </script>
+  <script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/content.js"></script>
+  <script>
+    for(const lang of Object.keys(LexLensCore.LEVELS)){
+      const select=document.getElementById(`${lang}-level`);
+      for(const level of LexLensCore.LEVELS[lang]){const option=document.createElement('option');option.value=level;option.textContent=lang==='ko'?`TOPIK ${level}`:level;select.append(option)}
+      select.value=data.settings.levels[lang];
+      select.onchange=()=>{data.settings.levels[lang]=select.value;browser.storage.local.set({settings:{...data.settings}})};
+      document.getElementById(`${lang}-on`).onchange=event=>{data.settings.enabled[lang]=event.target.checked;browser.storage.local.set({settings:{...data.settings}})};
+    }
+    document.getElementById('density').onchange=event=>{data.settings.density=event.target.value;browser.storage.local.set({settings:{...data.settings}})};
+    document.getElementById('reader').onclick=()=>{for(const listener of messageListeners)listener({type:'lexlens:reading'},null,()=>{})};
+    document.getElementById('reset').onclick=()=>browser.storage.local.set({records:{}});
+    document.getElementById('add').onclick=()=>{const p=document.createElement('p');p.textContent='A meticulous new comment appeared.';document.getElementById('dynamic').append(p)};
+    document.getElementById('remove').onclick=()=>document.getElementById('dynamic').replaceChildren();
+  </script>
+</body></html>

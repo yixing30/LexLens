@@ -1,0 +1,43 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>LexLens lookup integration</title><link rel="stylesheet" href="../src/content.css"></head><body>
+<p id="sample">The bank is nearby.</p><a id="link" href="#target">Ubiquitous link</a><p id="split">We <em>ran</em> <strong>out</strong> of time.</p><p id="algorithm">The algorithm changed.</p><p id="target">Target</p><output id="result"></output><output id="result-dictionary"></output>
+<script>
+  const nativeAttachShadow=Element.prototype.attachShadow;
+  Element.prototype.attachShadow=function(options){return nativeAttachShadow.call(this,{...options,mode:'open'})};
+  const listeners=[];let onMessage;
+  window.browser={storage:{local:{get:(_keys,done)=>done({}),set:(_value,done)=>done?.()},onChanged:{addListener:fn=>listeners.push(fn)}},runtime:{onMessage:{addListener:fn=>{onMessage=fn}}}};
+</script>
+<script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/content.js"></script>
+<script>
+  window.onerror=(message)=>{document.getElementById('result').textContent='ERROR: '+message};
+  setTimeout(()=>{
+    const text=document.getElementById('sample').firstChild;
+    const start=text.textContent.indexOf('bank');
+    const range=document.createRange();range.setStart(text,start);range.setEnd(text,start+4);
+    const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+    document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+    const shadow=document.getElementById('lexlens-ui-host')?.shadowRoot;
+    const action=shadow?.querySelector('.lookup-action');
+    for(const type of ['mousedown','mouseup','click'])action?.dispatchEvent(new MouseEvent(type,{bubbles:true,composed:true}));
+    const panel=shadow?.querySelector('.panel');
+    const lookup={action:!!action,panel:!!panel,senses:panel?.querySelectorAll('.sense').length,river:panel?.textContent.includes('河岸'),finance:panel?.textContent.includes('银行')};
+    panel?.querySelector('.close')?.click();
+    document.querySelector('#link ruby')?.click();
+    const linkPanel=shadow?.querySelector('.panel');
+    onMessage({type:'lexlens:reading'},null,()=>{});
+    const reader=shadow?.querySelector('.reader');
+    document.getElementById('result').textContent=JSON.stringify({...lookup,linkDetail:!!linkPanel,originalLink:linkPanel?.querySelector('a')?.getAttribute('href')===document.getElementById('link').href,navigated:!!location.hash,reader:!!reader,readerPhrase:[...(reader?.querySelectorAll('ruby rb')||[])].some(x=>x.textContent==='ran out of')});
+    reader?.querySelector('button')?.click();
+    const algorithm=document.getElementById('algorithm').firstChild;
+    const word='algorithm',algorithmStart=algorithm.textContent.indexOf(word);
+    const dictionaryRange=document.createRange();dictionaryRange.setStart(algorithm,algorithmStart);dictionaryRange.setEnd(algorithm,algorithmStart+word.length);
+    selection.removeAllRanges();selection.addRange(dictionaryRange);
+    document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+    const dictionaryAction=shadow?.querySelector('.lookup-action');
+    for(const type of ['mousedown','mouseup','click'])dictionaryAction?.dispatchEvent(new MouseEvent(type,{bubbles:true,composed:true}));
+    setTimeout(()=>{
+      const dictionaryPanel=shadow?.querySelector('.panel');
+      document.getElementById('result-dictionary').textContent=JSON.stringify({action:!!dictionaryAction,panel:!!dictionaryPanel,algorithm:dictionaryPanel?.textContent.includes('算法'),undisambiguated:dictionaryPanel?.textContent.includes('未按当前句子消歧'),recordButtons:dictionaryPanel?.querySelectorAll('.sense .actions button').length});
+    },500);
+  },1600);
+</script>
+</body></html>

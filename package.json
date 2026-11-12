@@ -1,0 +1,11 @@
+{
+  "name": "lexlens",
+  "version": "0.7.8",
+  "private": true,
+  "description": "Local-first vocabulary annotation browser extension prototype",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/core.js && node --check src/content.js && node --check src/popup.js && node --check src/options.js && node --check src/background.js",
+    "build:extension": "python3 scripts/package_extension.py"
+  }
+}

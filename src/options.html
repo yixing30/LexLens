@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LexLens 设置</title><link rel="stylesheet" href="ui.css"></head>
+<body class="options">
+  <h1>LexLens 设置</h1>
+  <p>英语使用本机词表和词典；网页词汇识别与释义没有联网接口。</p>
+  <div class="card"><h2>个人词义记录</h2><p class="muted">自动标注的认识状态按词义保存；主动查词后添加的“仍不认识”标注按所选词形保存，并使用本地词典短义。</p><ul id="records"></ul><button id="clear-records">清空个人记录</button></div>
+  <div class="card"><h2>关闭标注的网站</h2><ul id="sites"></ul></div>
+  <div class="card"><h2>使用边界与来源</h2><p>英语“词表分级”使用 CEFR-J A1–B2 与 Octanove C1/C2 的词形、词性等级，在超等级词上方显示本地 ECDICT 的简短中文常见义。人工语境规则命中时优先显示对应词义；词典义尚未逐句消歧，请结合上下文核对。“包含粗略估计”还会增加按 ECDICT 词频估计等级的词。切换等级会重算任何已授权的英文网页，不为某篇文章保存专属标注。</p><p>英文词典数据来自 <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noopener noreferrer">ECDICT</a>；等级词表来源和许可见扩展安装目录的 data/ENGLISH-LEVELS-NOTICE.md。网页图片、PDF、画布、字幕和浏览器内部页面不在扫描范围内。</p><p>阅读视图仅复制可读取的网页文字；原网页的布局、链接和互动元素仍保留在原页面。</p></div>
+  <p id="status" class="status" role="status"></p>
+  <script src="core.js"></script><script src="options.js"></script>
+</body></html>

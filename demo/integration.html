@@ -1,0 +1,44 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>LexLens DOM integration smoke</title>
+<link rel="stylesheet" href="../src/content.css"><style>body{font:18px/2 system-ui}#result{white-space:pre-wrap}</style></head><body>
+<h1>Meticulous heading</h1><nav><button>Ubiquitous navigation</button></nav>
+<p id="repeat">A meticulous plan needs meticulous work.</p>
+<p id="sense">The river bank flooded. I deposited money at the bank.</p>
+<p id="split">We <em>ran</em> <strong>out</strong> of time.</p>
+<p id="context">The river <strong>bank</strong> flooded.</p>
+<p id="across-input">We ran <input value="private"> out of time.</p>
+<p id="across-code">We ran <code>ignored</code> out of time.</p>
+<p id="context-barrier">The river <code>ignored</code> bank is nearby.</p>
+<p id="english-data">The abbey stood on a hill.</p>
+<p id="japanese">複雑な問題。</p><p id="korean">불가피한 결정.</p>
+<div id="dynamic"></div><input value="meticulous"><div contenteditable="true">Meticulous editable</div><pre>meticulous code</pre>
+<script>
+  const listeners=[];let state={settings:{enabled:{en:true,ja:true,ko:true},levels:{en:'B1',ja:'N3',ko:'3'},density:'standard',disabledSites:[]},records:{}};
+  window.browser={storage:{local:{get:(_keys,callback)=>callback(state),set:(value,callback)=>{const changes={};for(const [key,next] of Object.entries(value)){changes[key]={oldValue:state[key],newValue:next};state[key]=next}for(const listener of listeners)listener(changes,'local');callback?.()}},onChanged:{addListener:listener=>listeners.push(listener)}},runtime:{onMessage:{addListener:()=>{}}}};
+  const shadowHost=document.createElement('div');shadowHost.id='shadow-host';document.body.append(shadowHost);
+  shadowHost.attachShadow({mode:'open'}).innerHTML='<p>The abbey stood.</p><div id="shadow-dynamic"></div>';
+</script>
+<script src="../data/english-levels.js"></script><script src="../data/english-inline.js"></script><script src="../data/english-auto.js"></script><script src="../src/core.js"></script><script src="../src/content.js"></script>
+<script>
+  setTimeout(()=>{
+    const newText=document.createElement('p');newText.textContent='A meticulous new comment.';document.getElementById('dynamic').append(newText);
+    const shadowText=document.createElement('p');shadowText.textContent='A meticulous widget appeared.';shadowHost.shadowRoot.getElementById('shadow-dynamic').append(shadowText);
+  },100);
+  setTimeout(()=>{
+    const count=document.querySelectorAll('ruby.lexlens-mark').length;
+    const result=document.createElement('output');result.id='result';
+    result.textContent=JSON.stringify({count,heading:!!document.querySelector('h1 ruby'),button:!!document.querySelector('nav button ruby'),repeat:document.querySelectorAll('#repeat ruby').length,sense:document.querySelectorAll('#sense ruby').length,split:document.querySelectorAll('#split .lexlens-mark').length,context:document.querySelectorAll('#context ruby').length,englishData:document.querySelector('#english-data ruby')?.querySelector('rt')?.textContent,shadow:shadowHost.shadowRoot.querySelectorAll('ruby').length,acrossInput:document.querySelectorAll('#across-input ruby').length,acrossCode:document.querySelectorAll('#across-code ruby').length,contextBarrier:document.querySelectorAll('#context-barrier ruby').length,japanese:!!document.querySelector('#japanese ruby'),korean:!!document.querySelector('#korean ruby'),dynamic:!!document.querySelector('#dynamic ruby'),editable:!!document.querySelector('[contenteditable] ruby'),code:!!document.querySelector('pre ruby')});
+    document.body.append(result);
+  },1600);
+  setTimeout(()=>{
+    document.getElementById('dynamic').replaceChildren();
+    document.getElementById('context').firstChild.textContent='I deposited money at the ';
+    document.getElementById('context').lastChild.textContent='.';
+    browser.storage.local.set({records:{'en:meticulous:careful':'known'}});
+  },1800);
+  setTimeout(()=>{
+    const result=document.createElement('output');result.id='result-after';
+    result.textContent=JSON.stringify({count:document.querySelectorAll('ruby.lexlens-mark').length,dynamic:!!document.querySelector('#dynamic ruby'),heading:!!document.querySelector('h1 ruby'),context:document.querySelectorAll('#context ruby').length,split:document.querySelectorAll('#split .lexlens-mark').length,shadow:shadowHost.shadowRoot.querySelectorAll('ruby').length,japanese:!!document.querySelector('#japanese ruby')});
+    document.body.append(result);
+  },4000);
+</script>
+</body></html>

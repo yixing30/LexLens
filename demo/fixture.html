@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>LexLens 手动验收页面</title>
+<style>body{font:18px/2 system-ui;max-width:850px;margin:30px auto;padding:0 20px}button,nav,td{font:inherit}table{border-collapse:collapse}td{border:1px solid #aaa;padding:12px}.narrow{width:130px;border:1px solid #888;padding:4px}</style></head>
+<body>
+  <h1>Meticulous reading · 複雑な文章 · 불가피한 결정</h1>
+  <nav><a href="https://example.com/">Ubiquitous services</a> · <button>Nevertheless</button></nav>
+  <p>The river bank flooded. I deposited money at the bank. The bank is nearby.</p>
+  <p>We ran out of time. The report has a subtle difference. Meticulous work requires patience.</p>
+  <p>The proposal introduced an unfamiliar framework and a substantial revision.</p>
+  <p>跨标签词组：We <em>ran</em> <strong>out</strong> of time.</p>
+  <p>跨标签句义：The river <strong>bank</strong> flooded. 选中没有标注的 bank，也可以主动查询。</p>
+  <p>余儀なくされた変更は顕著な影響を与えた。複雑な問題を見積もった。</p>
+  <p>불가피한 결정으로 문제를 해결했다. 현저한 변화가 있었다.</p>
+  <table><tr><td>Meticulous table text</td><td>複雑な表</td></tr></table>
+  <p class="narrow">Ubiquitous meticulous</p>
+  <label>输入框 <input value="meticulous"></label><div contenteditable="true">Meticulous editable content</div>
+  <pre>meticulous code</pre>
+  <div id="dynamic"></div><button id="add">添加动态文字</button><button id="remove">删除动态文字</button>
+  <script>document.getElementById('add').onclick=()=>{const p=document.createElement('p');p.textContent='A meticulous new comment appeared.';document.getElementById('dynamic').append(p)};document.getElementById('remove').onclick=()=>document.getElementById('dynamic').replaceChildren()</script>
+</body></html>
