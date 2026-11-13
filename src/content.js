@@ -38,6 +38,7 @@
   let readerPointerStart;
   let readerPointerDragged = false;
   let readerSelectionBefore = '';
+  let dismissedLayoutSites = new Set();
 
   function siteDisabled() { return settings.disabledSites.includes(siteHostname); }
   function topHostname() {
@@ -1089,15 +1090,27 @@
     range.setStart(node, start); range.setEnd(node, end);
     return { word, range };
   }
-  function showBanner(message, readingButton = true) {
+  function showBanner(message, readingButton = true, kind = '') {
+    if (kind === 'layout' && dismissedLayoutSites.has(siteHostname)) return;
     ensureUi();
-    shadow.querySelector('.banner')?.remove();
+    const current = shadow.querySelector('.banner');
+    if (current?.dataset.kind === kind && current.querySelector('span')?.textContent === message) return;
+    current?.remove();
     const banner = document.createElement('div'); banner.className = 'banner'; banner.setAttribute('role', 'status');
+    if (kind) banner.dataset.kind = kind;
     const span = document.createElement('span'); span.textContent = message; banner.append(span);
     if (readingButton) {
       const button = document.createElement('button'); button.textContent = '独立阅读视图'; button.onclick = openReader; banner.append(button);
     }
-    const close = document.createElement('button'); close.textContent = '×'; close.setAttribute('aria-label', '关闭提示'); close.onclick = () => banner.remove(); banner.append(close);
+    const close = document.createElement('button'); close.textContent = '×'; close.setAttribute('aria-label', '关闭提示');
+    close.onclick = () => {
+      banner.remove();
+      if (kind === 'layout' && !dismissedLayoutSites.has(siteHostname)) {
+        dismissedLayoutSites.add(siteHostname);
+        void storeSet({ dismissedLayoutSites: [...dismissedLayoutSites] });
+      }
+    };
+    banner.append(close);
     shadow.append(banner);
   }
   function requestLayoutCheck() {
@@ -1149,8 +1162,7 @@
     let clipped = false;
     for (const rt of annotations) if (!fitGloss(rt)) clipped = true;
     if (clipped) {
-      showBanner('部分行间释义仍受网页裁剪，可在独立阅读视图中查看。');
-      shadow.querySelector('.banner').dataset.kind = 'layout';
+      showBanner('部分行间释义仍受网页裁剪，可在独立阅读视图中查看。', true, 'layout');
       return;
     }
     for (let i = 0; i < annotations.length; i++) {
@@ -1159,8 +1171,7 @@
         if (blockFor(annotations[i].parentElement) !== blockFor(annotations[j].parentElement)) continue;
         const b = annotations[j].getBoundingClientRect();
         if (a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1) {
-          showBanner('相邻释义发生拥挤，请使用独立阅读视图。');
-          shadow.querySelector('.banner').dataset.kind = 'layout';
+          showBanner('相邻释义发生拥挤，请使用独立阅读视图。', true, 'layout');
           return;
         }
       }
@@ -1351,14 +1362,19 @@
       floatingButtonY = Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 1;
       positionFloatingButton();
     }
+    if (changes.dismissedLayoutSites) {
+      dismissedLayoutSites = new Set(Array.isArray(changes.dismissedLayoutSites.newValue) ? changes.dismissedLayoutSites.newValue : []);
+      if (dismissedLayoutSites.has(siteHostname)) shadow?.querySelector('.banner[data-kind="layout"]')?.remove();
+    }
   });
   observer = new MutationObserver(onMutations);
-  Promise.all([storeGet(['settings', 'records', 'floatingButtonEnabled', 'floatingButtonY']), topHostname()]).then(([value, hostname]) => {
+  Promise.all([storeGet(['settings', 'records', 'floatingButtonEnabled', 'floatingButtonY', 'dismissedLayoutSites']), topHostname()]).then(([value, hostname]) => {
     siteHostname = hostname;
     settings = core.normalizeSettings(value.settings);
     records = value.records || {};
     floatingButtonEnabled = value.floatingButtonEnabled === true;
     floatingButtonY = Number.isFinite(value.floatingButtonY) ? Math.max(0, Math.min(1, value.floatingButtonY)) : 1;
+    dismissedLayoutSites = new Set(Array.isArray(value.dismissedLayoutSites) ? value.dismissedLayoutSites : []);
     observe();
     ready = true;
     syncFloatingButton();
