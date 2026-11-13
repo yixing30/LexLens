@@ -34,6 +34,10 @@
   let suppressFloatingClick = false;
   let readerFontSize = 20;
   let readerTheme = 'light';
+  let readerSelectionTimer;
+  let readerPointerStart;
+  let readerPointerDragged = false;
+  let readerSelectionBefore = '';
 
   function siteDisabled() { return settings.disabledSites.includes(siteHostname); }
   function topHostname() {
@@ -391,7 +395,7 @@
       .reader-body blockquote p { margin:0; }
       .reader-body ol,.reader-body ul { margin:0 0 1.3em; padding-left:1.5em; }
       .reader-body li { padding-left:.2em; }
-      .reader-body ruby { ruby-position:over; cursor:pointer; }
+      .reader-body ruby { ruby-position:over; cursor:pointer; white-space:nowrap; }
       .reader-body rt { color:var(--accent); background:var(--gloss); font:650 .5em/1.1 system-ui,-apple-system,"PingFang SC",sans-serif; white-space:nowrap; }
       .reader-empty { padding:50px 0; color:var(--muted); font:15px/1.7 system-ui,sans-serif; }
       .reader-end { display:flex; align-items:center; gap:18px; margin-top:55px; color:var(--muted); font:700 10px/1.5 system-ui,sans-serif; letter-spacing:.16em; }
@@ -408,6 +412,7 @@
     shadow.addEventListener('click', event => {
       const ruby = event.target.closest?.('.lexlens-mark');
       if (!ruby) return;
+      if (readerPointerDragged) return;
       event.preventDefault(); event.stopPropagation();
       openMark(ruby);
     });
@@ -418,8 +423,36 @@
       openMark(ruby);
     });
     shadow.addEventListener('pointerdown', event => {
-      if (detail?.isConnected && !detail.contains(event.target)) closeDetail();
+      readerPointerStart = event.target.closest?.('.reader-body') ? { x: event.clientX, y: event.clientY } : null;
+      readerPointerDragged = false;
+      if (detail?.isConnected && !detail.contains(event.target)) {
+        closeDetail();
+        window.getSelection()?.removeAllRanges();
+      }
+      readerSelectionBefore = window.getSelection()?.toString() || '';
     }, true);
+    shadow.addEventListener('pointermove', event => {
+      if (readerPointerStart && Math.hypot(event.clientX - readerPointerStart.x, event.clientY - readerPointerStart.y) > 5) readerPointerDragged = true;
+    }, { passive: true });
+    shadow.addEventListener('pointerup', () => {
+      readerPointerStart = null;
+      setTimeout(() => { readerPointerDragged = false; }, 0);
+    });
+    const queueReaderLookup = event => {
+      const block = event.target.closest?.('.reader-body p,.reader-body li,.reader-body blockquote,.reader-body h2,.reader-body h3,.reader-body h4');
+      if (!block || (event.target.closest?.('.lexlens-mark') && !readerPointerDragged)) return;
+      if ((event.type === 'pointerup' || event.type === 'mouseup') && !readerPointerDragged
+        && event.detail < 2 && window.getSelection()?.toString() === readerSelectionBefore) return;
+      clearTimeout(readerSelectionTimer);
+      const point = { x: event.clientX, y: event.clientY };
+      readerSelectionTimer = setTimeout(() => showReaderSelectionLookup(block, point), 0);
+    };
+    shadow.addEventListener('pointerup', queueReaderLookup);
+    shadow.addEventListener('mouseup', queueReaderLookup);
+    shadow.addEventListener('keyup', event => {
+      if (event.key !== 'Escape') queueReaderLookup(event);
+    });
+    shadow.addEventListener('touchend', queueReaderLookup, { passive: true });
   }
   function floatingRange() { return { min: 12, max: Math.max(12, innerHeight - 60) }; }
   function positionFloatingButton() {
@@ -982,10 +1015,24 @@
     }
     positionPanel(detail, rect);
   }
-  function showSelectionLookup() {
+  function selectedRange() {
     const selection = window.getSelection();
-    if (!selection?.rangeCount || selection.isCollapsed) return;
-    const range = selection.getRangeAt(0);
+    if (!selection?.rangeCount || selection.isCollapsed) return null;
+    try {
+      const composed = selection.getComposedRanges?.({ shadowRoots: [shadow] })?.[0];
+      if (composed) {
+        const range = document.createRange();
+        range.setStart(composed.startContainer, composed.startOffset);
+        range.setEnd(composed.endContainer, composed.endOffset);
+        return range;
+      }
+    } catch { /* Older browsers can still use the ordinary selection range. */ }
+    return selection.getRangeAt(0);
+  }
+  function showSelectionLookup() {
+    const range = selectedRange();
+    if (!range || range.collapsed) return;
+    const readerBody = shadow?.querySelector('.reader-body');
     const selected = range.cloneContents();
     selected.querySelectorAll('rt,script,style,#lexlens-ui-host').forEach(node => node.remove());
     selected.querySelectorAll('p,li,blockquote,br').forEach(node => node.append(document.createTextNode(' ')));
@@ -994,9 +1041,34 @@
     const parent = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
       ? range.commonAncestorContainer.parentElement : range.commonAncestorContainer;
     if (parent?.closest?.('input,textarea,[contenteditable],[role="textbox"],#lexlens-ui-host')) return;
+    if (readerBody?.contains(range.commonAncestorContainer)) return;
     const rect = range.getBoundingClientRect();
     if (!rect.width && !rect.height) return;
     void openLookup(query, rect, null, null, sourceSentence(range, query));
+  }
+  function showReaderSelectionLookup(block, point) {
+    const readerBody = shadow?.querySelector('.reader-body');
+    if (!readerBody?.contains(block)) return;
+    const selection = window.getSelection();
+    let query = selection?.toString().trim().replace(/\s+/g, ' ');
+    if (!query || query.length > 3000 || !/[A-Za-z]/.test(query)) return;
+    const range = selectedRange();
+    const inReader = range && readerBody.contains(range.commonAncestorContainer);
+    if (inReader) {
+      const selected = range.cloneContents();
+      selected.querySelectorAll('rt,script,style').forEach(node => node.remove());
+      selected.querySelectorAll('p,li,blockquote,br').forEach(node => node.append(document.createTextNode(' ')));
+      query = selected.textContent?.trim().replace(/\s+/g, ' ') || query;
+    } else {
+      const glosses = new Set([...readerBody.querySelectorAll('rt')].map(rt => rt.textContent).filter(Boolean));
+      for (const gloss of glosses) query = query.replaceAll(gloss, '');
+      query = query.trim().replace(/\s+/g, ' ');
+    }
+    if (!query || query.length > 3000 || !/[A-Za-z]/.test(query)) return;
+    const rect = inReader ? range.getBoundingClientRect()
+      : { left: point.x || innerWidth / 2, right: point.x || innerWidth / 2, top: point.y || innerHeight / 2, bottom: point.y || innerHeight / 2 };
+    const example = /^[A-Za-z][A-Za-z'-]*$/.test(query) ? readingText(block).slice(0, 300) : '';
+    void openLookup(query, rect, null, null, example);
   }
   function wordAtPoint(x, y) {
     const range = document.caretRangeFromPoint?.(x, y) || (() => {
@@ -1172,7 +1244,7 @@
     const heading = document.createElement('h1'); heading.textContent = title;
     const meta = document.createElement('div'); meta.className = 'reader-meta';
     const wordCount = blocks.reduce((count, block) => count + (block.text.match(/\b[\w'-]+\b/g)?.length || 0), 0);
-    for (const label of [`约 ${Math.max(1, Math.ceil(wordCount / 240))} 分钟`, '仅保留网页可读取文字', '词义标注依据当前等级']) {
+    for (const label of [`约 ${Math.max(1, Math.ceil(wordCount / 240))} 分钟`, '选词查词 · 选句看语法', '词义标注依据当前等级']) {
       const part = document.createElement('span'); part.textContent = label; meta.append(part);
     }
     hero.append(kicker, heading, meta);

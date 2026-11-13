@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LexLens 本地网页阅读",
-  "version": "0.7.15",
+  "version": "0.7.16",
   "description": "在英文网页原位显示本地中文词义提示；网页文字不会上传。",
   "icons": {
     "16": "icons/icon-16.png",
